@@ -1,0 +1,23 @@
+{
+  "name": "revit-family-viewer",
+  "version": "1.0.0",
+  "description": "Three.js viewer for Revit Family GLB files with parametric controls",
+  "main": "app.js",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "live-server"
+  },
+  "keywords": [
+    "revit",
+    "three.js",
+    "glb",
+    "parametric",
+    "viewer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {}
+}

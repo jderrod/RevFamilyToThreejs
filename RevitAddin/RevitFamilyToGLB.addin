@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Assembly>C:\Users\james.derrod\CascadeProjects\RevFamilyToThreejs\RevitAddin\bin\Debug\RevitFamilyToGLB.dll</Assembly>
+    <ClientId>e8c63650-70b7-4b8d-9e6e-9c4d8a5c8f5d</ClientId>
+    <FullClassName>RevitFamilyToGLB.Commands.FamilyToGLBCommand</FullClassName>
+    <Text>Export Family to GLB</Text>
+    <Description>Export Revit Family to GLB format with parametric metadata</Description>
+    <VisibilityMode>NotVisibleWhenNoActiveDocument</VisibilityMode>
+    <LanguageType>Unknown</LanguageType>
+    <VendorId>ADSK</VendorId>
+    <VendorDescription>Revit Family to Three.js Converter</VendorDescription>
+  </AddIn>
+</RevitAddIns>

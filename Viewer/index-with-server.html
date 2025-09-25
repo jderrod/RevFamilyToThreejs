@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revit Family GLB Viewer (Server-Enabled)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #5a67d8;
+        }
+
+        .file-name {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            padding: 1rem;
+            gap: 1rem;
+            min-height: 0;
+        }
+
+        .viewer-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            overflow-y: auto;
+            transition: transform 0.3s;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(calc(100% + 1rem));
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .parameter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .parameter-group h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .parameter {
+            margin-bottom: 1rem;
+        }
+
+        .parameter label {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: #444;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .parameter input[type="number"],
+        .parameter input[type="text"],
+        .parameter select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+        }
+
+        .parameter input:focus,
+        .parameter select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .parameter input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        .parameter-info {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.25rem;
+        }
+
+        .type-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .type-selector select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .stats {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .stats-label {
+            color: #666;
+        }
+
+        .stats-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .toggle-sidebar {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem;
+            background: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f56565;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            max-width: 80%;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: 40vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Revit Family GLB Viewer (Server-Enabled)</h1>
+        <div class="controls">
+            <div class="file-input-wrapper">
+                <label for="file-input" class="file-input-label">Load GLB File</label>
+                <input type="file" id="file-input" accept=".glb">
+            </div>
+            <span class="file-name" id="file-name">No file loaded</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="viewer-container">
+            <button class="toggle-sidebar" id="toggle-sidebar">☰</button>
+            <div id="canvas-container"></div>
+            <div class="loading" id="loading" style="display: none;">Loading...</div>
+            <div class="error" id="error" style="display: none;"></div>
+        </div>
+
+        <div class="sidebar" id="sidebar">
+            <h2>Family Parameters</h2>
+            
+            <div class="type-selector" id="type-selector" style="display: none;">
+                <label>Family Type:</label>
+                <select id="family-type-select"></select>
+            </div>
+
+            <div id="parameters-container"></div>
+
+            <div class="stats" id="stats">
+                <div class="stats-item">
+                    <span class="stats-label">Vertices:</span>
+                    <span class="stats-value" id="vertex-count">-</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Triangles:</span>
+                    <span class="stats-value" id="triangle-count">-</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">File Size:</span>
+                    <span class="stats-value" id="file-size">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app-with-server.js"></script>
+</body>
+</html>

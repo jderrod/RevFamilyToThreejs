@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <h1>Revit Family GLB Viewer - Complete with 3D Display</h1>
+    <title>Revit Family GLB Viewer - No CDN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #5a67d8;
+        }
+
+        .file-name {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            padding: 1rem;
+            gap: 1rem;
+            min-height: 0;
+        }
+
+        .viewer-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .parameter-item {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: #f7fafc;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .parameter-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .parameter-value {
+            margin: 0.25rem 0;
+        }
+
+        .parameter-input {
+            width: 100%;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .apply-button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .parameter-computed {
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin-top: 0.25rem;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f56565;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            max-width: 80%;
+            text-align: center;
+        }
+
+        .status {
+            background: #e6fffa;
+            border: 1px solid #38b2ac;
+            color: #234e52;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Revit Family GLB Viewer - Complete with 3D Display</h1>
+        <div class="controls">
+            <div class="file-input-wrapper">
+                <label for="file-input" class="file-input-label">Load GLB File</label>
+                <input type="file" id="file-input" accept=".glb">
+            </div>
+            <span class="file-name" id="file-name">No file loaded</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="viewer-container">
+            <div id="canvas-container"></div>
+            <div class="loading" id="loading" style="display: none;">Loading...</div>
+            <div class="error" id="error" style="display: none;"></div>
+        </div>
+
+        <div class="sidebar" id="sidebar">
+            <h2>Status</h2>
+            <div class="status" id="status">
+                <p><strong>🚀 No CDN Version</strong></p>
+                <p>This version uses basic WebGL without Three.js to avoid all import/CDN issues.</p>
+                <p>Load a GLB file to see basic geometry display and metadata extraction.</p>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('editable')">Editable</button>
+                <button class="tab" onclick="switchTab('all')">All Parameters</button>
+            </div>
+
+            <div id="editable-params" class="tab-content active"></div>
+            <div id="all-params" class="tab-content"></div>
+            
+            <button class="apply-button" onclick="applyChanges()">Apply Changes</button>
+        </div>
+    </div>
+
+    <!-- Three.js r149 - works with script tags -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r149/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+        console.log('Starting viewer with Three.js:', THREE);
+        
+        // Basic WebGL setup without Three.js
+        // Global parameter storage
+        let currentParameters = [];
+        let currentValues = {};
+        let originalValues = {};
+
+        class SimpleViewer {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.controls = null;
+                this.model = null;
+                this.gltf = null;
+                this.init();
+                this.setupEventListeners();
+            }
+
+            init() {
+                const container = document.getElementById('canvas-container');
+                
+                // Scene setup
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0xf0f0f0);
+
+                // Camera setup
+                this.camera = new THREE.PerspectiveCamera(
+                    45,
+                    container.clientWidth / container.clientHeight,
+                    0.1,
+                    1000
+                );
+                this.camera.position.set(5, 5, 5);
+
+                // Renderer setup
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(container.clientWidth, container.clientHeight);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.shadowMap.enabled = true;
+                container.appendChild(this.renderer.domElement);
+
+                // Controls setup
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true;
+                this.controls.dampingFactor = 0.05;
+
+                // Lighting setup
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                this.scene.add(ambientLight);
+
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(5, 10, 5);
+                this.scene.add(directionalLight);
+
+                // Grid helper
+                const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0xcccccc);
+                this.scene.add(gridHelper);
+
+                // Start animation loop
+                this.animate();
+
+                document.getElementById('status').innerHTML = `
+                    <p><strong>✅ Three.js Initialized Successfully</strong></p>
+                    <p>Version: r149</p>
+                    <p>WebGL Renderer: ${this.renderer.capabilities.maxTextureSize}px max texture</p>
+                    <p>Ready to load GLB files with full 3D display.</p>
+                `;
+
+                // Handle resize
+                window.addEventListener('resize', () => this.onResize());
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                this.controls.update();
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            setupEventListeners() {
+                const fileInput = document.getElementById('file-input');
+                fileInput.addEventListener('change', (e) => this.loadFile(e.target.files[0]));
+            }
+
+            loadFile(file) {
+                if (!file) return;
+
+                console.log('Loading file:', file.name, 'Size:', file.size);
+                document.getElementById('file-name').textContent = file.name;
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+
+                const loader = new THREE.GLTFLoader();
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    console.log('File read successfully, parsing GLB...');
+                    const arrayBuffer = e.target.result;
+                    
+                    loader.parse(arrayBuffer, '', 
+                        (gltf) => {
+                            console.log('GLB parsed successfully:', gltf);
+                            this.onModelLoaded(gltf, file.size);
+                        }, 
+                        (error) => {
+                            console.error('GLB parse error:', error);
+                            this.onLoadError(error);
+                        }
+                    );
+                };
+
+                reader.onerror = (e) => {
+                    console.error('File reader error:', e);
+                    this.onLoadError(e);
+                };
+
+                reader.readAsArrayBuffer(file);
+            }
+
+            onModelLoaded(gltf, fileSize) {
+                try {
+                    console.log('Processing loaded model...');
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    // Remove existing model
+                    if (this.model) {
+                        this.scene.remove(this.model);
+                    }
+
+                    // Add new model
+                    this.gltf = gltf;
+                    this.model = gltf.scene;
+                    
+                    console.log('Model scene:', this.model);
+                    this.scene.add(this.model);
+
+                    // Center and scale model
+                    const box = new THREE.Box3().setFromObject(this.model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    this.model.position.x = -center.x;
+                    this.model.position.y = -center.y;
+                    this.model.position.z = -center.z;
+
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 10 / maxDim;
+                    this.model.scale.multiplyScalar(scale);
+
+                    this.camera.position.set(15, 15, 15);
+                    this.camera.lookAt(0, 0, 0);
+                    this.controls.target.set(0, 0, 0);
+                    this.controls.update();
+
+                    // Extract metadata and setup parameter editor
+                    this.displayMetadata(gltf);
+
+                    // Update stats
+                    this.updateStats(fileSize);
+                    
+                    console.log('Model loaded successfully');
+                } catch (error) {
+                    console.error('Error in onModelLoaded:', error);
+                    this.onLoadError(error);
+                }
+            }
+
+            updateStats(fileSize) {
+                let vertexCount = 0;
+                let triangleCount = 0;
+
+                this.model.traverse((child) => {
+                    if (child.isMesh && child.geometry) {
+                        const geometry = child.geometry;
+                        if (geometry.attributes.position) {
+                            vertexCount += geometry.attributes.position.count;
+                        }
+                        if (geometry.index) {
+                            triangleCount += geometry.index.count / 3;
+                        }
+                    }
+                });
+
+                const formatFileSize = (bytes) => {
+                    if (bytes < 1024) return bytes + ' B';
+                    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+                    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+                };
+
+                document.getElementById('status').innerHTML = `
+                    <p><strong>✅ 3D Model Loaded Successfully</strong></p>
+                    <p>File Size: ${formatFileSize(fileSize)}</p>
+                    <p>Vertices: ${vertexCount.toLocaleString()}</p>
+                    <p>Triangles: ${triangleCount.toLocaleString()}</p>
+                    <p>Generator: ${this.gltf.asset?.generator || 'Unknown'}</p>
+                `;
+            }
+
+            displayMetadata(gltf, fileName) {
+                if (gltf.asset && gltf.asset.extras) {
+                    let extras = gltf.asset.extras;
+                    
+                    // If extras is a string, try to parse as JSON
+                    if (typeof extras === 'string') {
+                        try {
+                            extras = JSON.parse(extras);
+                        } catch (e) {
+                            console.error('Failed to parse extras JSON:', e);
+                        }
+                    }
+                    
+                    if (extras.rvt) {
+                        const rvtData = extras.rvt;
+                        currentParameters = rvtData.parameters || [];
+                        
+                        if (rvtData.types && rvtData.types.length > 0) {
+                            currentValues = { ...rvtData.types[0].values };
+                            originalValues = { ...rvtData.types[0].values };
+                        }
+                        
+                        this.renderParameterTabs();
+                    }
+                }
+            }
+
+            renderParameterTabs() {
+                // Filter editable parameters
+                const editableParams = currentParameters.filter(p => {
+                    const hasFormula = p.Formula && p.Formula.trim() !== '' && p.Formula.trim() !== 'null';
+                    const isReporting = p.IsReporting === true;
+                    const isReadOnly = p.IsReadOnly === true;
+                    return !hasFormula && !isReporting && !isReadOnly;
+                });
+
+                const editableContainer = document.getElementById('editable-params');
+                const allContainer = document.getElementById('all-params');
+
+                editableContainer.innerHTML = this.renderEditableParameters(editableParams);
+                allContainer.innerHTML = this.renderAllParameters(currentParameters);
+
+                // Attach event listeners
+                this.attachEventListeners();
+            }
+
+            renderEditableParameters(params) {
+                if (params.length === 0) {
+                    return `<div style="padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+                        <h4>⚠️ No Editable Parameters</h4>
+                        <p>All parameters have formulas or are read-only.</p>
+                    </div>`;
+                }
+
+                let html = `<div style="margin-bottom: 1rem; padding: 0.75rem; background: #e8f5e8; border: 1px solid #4caf50; border-radius: 6px;">
+                    <strong>✏️ Editable Parameters (${params.length})</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Modify these values and click Apply Changes.</p>
+                </div>`;
+
+                params.forEach(param => {
+                    const value = currentValues[param.Name] || '';
+                    html += this.createEditableParameterHTML(param, value);
+                });
+
+                return html;
+            }
+
+            renderAllParameters(params) {
+                let html = `<div style="margin-bottom: 1rem; padding: 0.75rem; background: #f0f8ff; border: 1px solid #667eea; border-radius: 6px;">
+                    <strong>📊 All Parameters (${params.length})</strong>
+                </div>`;
+
+                params.forEach(param => {
+                    const value = currentValues[param.Name] || '';
+                    const hasFormula = param.Formula && param.Formula.trim() !== '' && param.Formula.trim() !== 'null';
+                    const isReporting = param.IsReporting === true;
+                    const isReadOnly = param.IsReadOnly === true;
+                    
+                    if (hasFormula || isReporting || isReadOnly) {
+                        html += this.createReadOnlyParameterHTML(param, value);
+                    } else {
+                        html += this.createEditableParameterHTML(param, value);
+                    }
+                });
+
+                return html;
+            }
+
+            createEditableParameterHTML(param, value) {
+                const paramId = param.Name.replace(/[^a-zA-Z0-9]/g, '_');
+                let html = `<div class="parameter-item" style="border-left: 4px solid #4caf50; background: #f8fff8;">`;
+                html += `<div class="parameter-name" style="color: #2e7d32;">✏️ ${param.Name}</div>`;
+
+                if (param.StorageType === 'Integer' && param.DataType && param.DataType.includes('bool')) {
+                    const isChecked = value === 1 || value === true;
+                    html += `<div>
+                        <input type="checkbox" id="${paramId}" ${isChecked ? 'checked' : ''} data-param-name="${param.Name}">
+                        <label for="${paramId}">${isChecked ? 'True' : 'False'}</label>
+                    </div>`;
+                } else if (param.StorageType === 'Double') {
+                    const numValue = typeof value === 'number' ? value : 0;
+                    const feet = numValue / 0.3048;
+                    html += `<div>
+                        <input type="number" id="${paramId}" class="parameter-input" value="${numValue}" step="0.001" data-param-name="${param.Name}">
+                        <div class="parameter-computed">${numValue.toFixed(4)}m = ${feet.toFixed(3)}'</div>
+                    </div>`;
+                } else if (param.StorageType === 'String') {
+                    html += `<div>
+                        <input type="text" id="${paramId}" class="parameter-input" value="${value || ''}" data-param-name="${param.Name}">
+                    </div>`;
+                } else {
+                    html += `<div>
+                        <input type="text" id="${paramId}" class="parameter-input" value="${value || ''}" data-param-name="${param.Name}">
+                    </div>`;
+                }
+
+                html += `</div>`;
+                return html;
+            }
+
+            createReadOnlyParameterHTML(param, value) {
+                let displayValue = value;
+                if (param.StorageType === 'Double' && typeof value === 'number') {
+                    const feet = value / 0.3048;
+                    displayValue = `${value.toFixed(4)}m (${feet.toFixed(3)}')`;
+                } else if (param.StorageType === 'Integer' && param.DataType && param.DataType.includes('bool')) {
+                    displayValue = value === 1 ? 'True' : 'False';
+                }
+
+                const hasFormula = param.Formula && param.Formula.trim() !== '' && param.Formula.trim() !== 'null';
+                const icon = hasFormula ? '🧮' : '📊';
+                const color = hasFormula ? '#ff9800' : '#2196f3';
+
+                let html = `<div class="parameter-item" style="border-left: 4px solid ${color}; background: #f5f5f5;">`;
+                html += `<div class="parameter-name" style="color: ${color};">${icon} ${param.Name}</div>`;
+                html += `<div><input type="text" class="parameter-input" value="${displayValue}" disabled></div>`;
+                
+                if (hasFormula) {
+                    html += `<div style="font-size: 0.75rem; color: #666; margin-top: 0.25rem;">Formula: ${param.Formula}</div>`;
+                }
+                
+                html += `</div>`;
+                return html;
+            }
+
+            attachEventListeners() {
+                // Checkbox listeners
+                document.querySelectorAll('input[type="checkbox"][data-param-name]').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const paramName = e.target.dataset.paramName;
+                        const value = e.target.checked ? 1 : 0;
+                        const label = e.target.nextElementSibling;
+                        if (label) label.textContent = value === 1 ? 'True' : 'False';
+                        currentValues[paramName] = value;
+                    });
+                });
+                
+                // Number input listeners
+                document.querySelectorAll('input[type="number"][data-param-name]').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        const paramName = e.target.dataset.paramName;
+                        const value = parseFloat(e.target.value) || 0;
+                        const computed = e.target.nextElementSibling;
+                        if (computed) {
+                            const feet = value / 0.3048;
+                            computed.textContent = `${value.toFixed(4)}m = ${feet.toFixed(3)}'`;
+                        }
+                        currentValues[paramName] = value;
+                    });
+                });
+                
+                // Text input listeners
+                document.querySelectorAll('input[type="text"][data-param-name]').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        const paramName = e.target.dataset.paramName;
+                        currentValues[paramName] = e.target.value;
+                    });
+                });
+            }
+
+            onLoadError(error) {
+                document.getElementById('loading').style.display = 'none';
+                const errorElement = document.getElementById('error');
+                errorElement.textContent = `Failed to load GLB: ${error.message || error}`;
+                errorElement.style.display = 'block';
+                console.error('Load error:', error);
+            }
+
+            onResize() {
+                const container = document.getElementById('canvas-container');
+                this.camera.aspect = container.clientWidth / container.clientHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+        }
+
+        // Global functions for UI
+        window.switchTab = function(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            if (tabName === 'editable') {
+                document.getElementById('editable-params').classList.add('active');
+            } else if (tabName === 'all') {
+                document.getElementById('all-params').classList.add('active');
+            }
+        };
+
+        window.applyChanges = function() {
+            const changes = {};
+            for (const key in currentValues) {
+                if (currentValues[key] !== originalValues[key]) {
+                    changes[key] = currentValues[key];
+                }
+            }
+            
+            if (Object.keys(changes).length > 0) {
+                console.log('Applying parameter changes:', changes);
+                alert(`Parameters updated!\n\nChanged values:\n${Object.entries(changes).map(([k, v]) => `${k}: ${v}`).join('\n')}\n\nIn a full implementation, this would regenerate the geometry.`);
+            } else {
+                alert('No changes to apply.');
+            }
+        };
+
+        // Initialize viewer when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const viewer = new SimpleViewer();
+            console.log('No-CDN viewer initialized successfully');
+        });
+    </script>
+</body>
+</html>
