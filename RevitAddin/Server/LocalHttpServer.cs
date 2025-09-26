@@ -334,6 +334,9 @@ namespace RevitFamilyToGLB.Server
                     Geometry = geometryData
                 };
 
+                var relationshipExtractor = new ParameterRelationshipExtractor(doc, familyManager);
+                var relationships = relationshipExtractor.ExtractRelationships(parameterSchema);
+
                 var glbExporter = new GLBExporter();
                 using (var ms = new MemoryStream())
                 {
@@ -341,6 +344,7 @@ namespace RevitFamilyToGLB.Server
                     var result = glbExporter.Export(
                         new List<ExportedFamilyType> { exportedType },
                         parameterSchema,
+                        relationships,
                         tempPath);
 
                     if (result.Success)

@@ -20,3 +20,4 @@ C:\Users\james.derrod\CascadeProjects\RevFamilyToThreejs\RevitAddin\bin\Debug\Sy
 C:\Users\james.derrod\CascadeProjects\RevFamilyToThreejs\RevitAddin\obj\x64\Debug\RevitFam.08B096D6.Up2Date
 C:\Users\james.derrod\CascadeProjects\RevFamilyToThreejs\RevitAddin\obj\x64\Debug\RevitFamilyToGLB.dll
 C:\Users\james.derrod\CascadeProjects\RevFamilyToThreejs\RevitAddin\obj\x64\Debug\RevitFamilyToGLB.pdb
+C:\Users\james.derrod\CascadeProjects\RevFamilyToThreejs\RevitAddin\obj\x64\Debug\RevitFamilyToGLB.sourcelink.json

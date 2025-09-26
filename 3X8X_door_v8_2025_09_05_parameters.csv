@@ -1,0 +1,73 @@
+﻿Parameter Name,Is Instance,Is Reporting,Is Shared,Storage Type,Data Type,Formula,GUID,Value (3082G),Units (3082G)
+door_top_margin,True,False,False,Double,autodesk.spec.aec:length-2.0.0,"1.72""",,0.043688 (0.1433 ft),m
+door_hole_top_hinge_hole_1_x_coor_from_door_hinge_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.968""",,0.024587 (0.0807 ft),m
+door_exterior_right_routing,True,False,True,Integer,autodesk.spec:spec.bool-1.0.0,"if(door_swing_direction_out, 1 = 0, 1 = 1)",,True,Boolean
+door_thickness,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.75""",,0.019050 (0.0625 ft),m
+hinge_hole_diameter,True,False,False,Double,autodesk.spec.aec:length-2.0.0,"0.5""",,0.012700 (0.0417 ft),m
+door_height,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"if(door_height_desired < 72"", 72"", if(door_height_desired > 96"", 96"", door_height_desired))",,2.438400 (8.0000 ft),m
+door_hole_mid_bottom_hinge_hole_1_x_coor_from_door_hinge_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.968""",,0.024587 (0.0807 ft),m
+mid_bottom_hinge_offset,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"if(and(door_floor_clearance = 1"", not(door_wall_post_hinging)), 2 * 0.823"", 0"")",,0.041808 (0.1372 ft),m
+door_hole_mid_top_hinge_hole_1_x_coor_from_door_hinge_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.968""",,0.024587 (0.0807 ft),m
+URL,False,False,False,String,autodesk.spec.string:url-2.0.0,,,,
+door_material,False,False,False,ElementId,autodesk.spec.aec:material-1.0.0,,,238,Element ID
+door_hole_top_hinge_hole_1_y_coor_from_door_top_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,door_top_margin,,0.043688 (0.1433 ft),m
+Type IFC Predefined Type,False,False,False,String,autodesk.spec:spec.string-2.0.0,,,,
+door_hole_bottom_hinge_hole_1_y_coor_from_door_top_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,door_hole_mid_bottom_hinge_hole_1_y_coor_from_door_top_edge + inter_hinge_gap + mid_top_hinge_offset,,2.272538 (7.4558 ft),m
+door_drilling_face,True,False,True,String,autodesk.spec:spec.string-2.0.0,"if(door_swing_direction_in, ""In"", ""Out"")",,In,Text
+door_hole_mid_top_hinge_hole_2_y_coor_from_door_top_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,door_hole_mid_top_hinge_hole_1_y_coor_from_door_top_edge + hinge_hole_space,,0.803834 (2.6373 ft),m
+Export Type to IFC As,False,False,False,String,autodesk.spec:spec.string-2.0.0,,,,
+door_routing_depth,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.5""",,0.012700 (0.0417 ft),m
+door_hole_mid_top_hinge_hole_1_y_coor_from_door_top_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,door_hole_top_hinge_hole_1_y_coor_from_door_top_edge + inter_hinge_gap + mid_top_hinge_offset,,0.765734 (2.5123 ft),m
+door_width_desired,True,False,False,Double,autodesk.spec.aec:length-2.0.0,,,0.076200 (0.2500 ft),m
+door_hole_bottom_hinge_hole_1_x_coor_from_door_hinge_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.968""",,0.024587 (0.0807 ft),m
+door_component_id,True,False,True,String,autodesk.spec:spec.string-2.0.0,,,,Text
+door_hinge_side_relative_to_room_right,True,False,False,Integer,autodesk.spec:spec.bool-1.0.0,,,True,Boolean
+door_exterior_left_routing,True,False,True,Integer,autodesk.spec:spec.bool-1.0.0,"if(door_swing_direction_out, 1 = 0, 1 = 1)",,True,Boolean
+Assembly Code,False,False,False,String,autodesk.spec:spec.string-2.0.0,,,,
+door_floor_clearance,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"if(door_floor_clearance_desired < 1"", 1"", if(door_floor_clearance_desired > 12"", 12"", door_floor_clearance_desired))",,0.025400 (0.0833 ft),m
+door_hinge_side_relative_to_room,True,False,True,String,autodesk.spec:spec.string-2.0.0,"if(door_hinge_side_relative_to_room_left, ""Left"", ""Right"")",,Right,Text
+Type Comments,False,False,False,String,autodesk.spec:spec.string-2.0.0,,,,
+door_hole_mid_top_hinge_hole_2_x_coor_from_door_hinge_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.968""",,0.024587 (0.0807 ft),m
+door_swing_direction_out,True,False,False,Integer,autodesk.spec:spec.bool-1.0.0,,,False,Boolean
+door_function_right,True,False,True,String,autodesk.spec:spec.string-2.0.0,"if(door_hinge_side_relative_to_room_right, ""Hinging"", ""Keeping"")",,Hinging,Text
+door_interior_left_routing,True,False,True,Integer,autodesk.spec:spec.bool-1.0.0,"if(door_swing_direction_in, 1 = 0, 1 = 1)",,False,Boolean
+door_hole_bottom_hinge_hole_2_y_coor_from_door_top_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,door_hole_bottom_hinge_hole_1_y_coor_from_door_top_edge + hinge_hole_space,,2.310638 (7.5808 ft),m
+door_bottom_margin,True,False,False,Double,autodesk.spec.aec:length-2.0.0,"1.72"" + if(and(door_floor_clearance = 1"", not(door_wall_post_hinging)), door_notching_y_dist, 0"")",,0.127762 (0.4192 ft),m
+inter_hinge_gap,True,False,False,Double,autodesk.spec.aec:length-2.0.0,(door_height - door_top_margin - (door_bottom_margin + hinge_hole_space)) / 3,,0.742950 (2.4375 ft),m
+door_floor_clearance_desired,True,False,False,Double,autodesk.spec.aec:length-2.0.0,,,0.025400 (0.0833 ft),m
+door_hinge_side_relative_to_room_left,True,False,False,Integer,autodesk.spec:spec.bool-1.0.0,not(door_hinge_side_relative_to_room_right),,False,Boolean
+door_interior_right_routing,True,False,True,Integer,autodesk.spec:spec.bool-1.0.0,"if(door_swing_direction_in, 1 = 0, 1 = 1)",,False,Boolean
+Model,False,False,False,String,autodesk.spec:spec.string-2.0.0,,,,
+door_hole_mid_bottom_hinge_hole_2_x_coor_from_door_hinge_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.968""",,0.024587 (0.0807 ft),m
+door_swing_direction_in,True,False,False,Integer,autodesk.spec:spec.bool-1.0.0,not(door_swing_direction_out),,True,Boolean
+door_notching_x_dist,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.4414""",,0.011212 (0.0368 ft),m
+hinge_hole_radius,True,False,False,Double,autodesk.spec.aec:length-2.0.0,"if(1 = 1, hinge_hole_diameter / 2, 0"")",,0.006350 (0.0208 ft),m
+door_drilling_side_relative_to_room,True,False,True,String,autodesk.spec:spec.string-2.0.0,"if(door_hinge_side_relative_to_room_left, ""Left"", ""Right"")",,Right,Text
+door_function_left,True,False,True,String,autodesk.spec:spec.string-2.0.0,"if(door_hinge_side_relative_to_room_left, ""Hinging"", ""Keeping"")",,Keeping,Text
+Manufacturer,False,False,False,String,autodesk.spec:spec.string-2.0.0,,,,
+Cost,False,False,False,Double,autodesk.spec.measurable:currency-2.0.0,,,0.000000,
+door_hole_mid_bottom_hinge_hole_2_y_coor_from_door_top_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,door_hole_mid_bottom_hinge_hole_1_y_coor_from_door_top_edge + hinge_hole_space,,1.588592 (5.2119 ft),m
+hinge_hole_space,True,False,False,Double,autodesk.spec.aec:length-2.0.0,"1.5""",,0.038100 (0.1250 ft),m
+Type Image,False,False,False,ElementId,autodesk.spec.reference:image-1.0.0,,,-1,Element ID
+door_wall_post_hinging,True,False,True,Integer,autodesk.spec:spec.bool-1.0.0,,,False,Boolean
+door_hole_top_hinge_hole_2_y_coor_from_door_top_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,door_top_margin + hinge_hole_space,,0.081788 (0.2683 ft),m
+door_hole_mid_bottom_hinge_hole_1_y_coor_from_door_top_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,door_hole_mid_top_hinge_hole_1_y_coor_from_door_top_edge + inter_hinge_gap + mid_bottom_hinge_offset,,1.550492 (5.0869 ft),m
+Keynote,False,False,False,String,autodesk.spec:spec.string-2.0.0,,,,
+door_hole_bottom_hinge_hole_2_x_coor_from_door_hinge_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.968""",,0.024587 (0.0807 ft),m
+door_routing_width,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.3""",,0.007620 (0.0250 ft),m
+Description,False,False,False,String,autodesk.spec:spec.string-2.0.0,,,,
+door_notching_y_dist,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"3.31""",,0.084074 (0.2758 ft),m
+Default Elevation,False,False,False,Double,autodesk.spec.aec:length-2.0.1,,,0.000000 (0.0000 ft),m
+door_series_id,False,False,True,String,autodesk.spec:spec.string-2.0.0,,,3082G,Text
+hole_front,True,False,False,Double,autodesk.spec.aec:length-2.0.0,"if(door_swing_direction_in, 0.1875"", 0"")",,0.004763 (0.0156 ft),m
+door_swing_direction,True,False,True,String,autodesk.spec:spec.string-2.0.0,"if(door_swing_direction_in, ""in"", ""out"")",,in,Text
+door_notching_right_relative_to_room,True,False,True,Integer,autodesk.spec:spec.bool-1.0.0,"if(not(door_floor_clearance = 1""), 1 = 0, if(and(door_hinge_side_relative_to_room_right, door_wall_post_hinging), 1 = 0, if(and(not(door_hinge_side_relative_to_room_right), door_wall_keep_latching), 1 = 0, 1 = 1)))",,True,Boolean
+door_wall_keep_latching,True,False,True,Integer,autodesk.spec:spec.bool-1.0.0,,,True,Boolean
+mid_top_hinge_offset,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"if(and(door_floor_clearance = 1"", not(door_wall_post_hinging)), -1 * 0.823"", 0"")",,-0.020904 (-0.0686 ft),m
+door_hole_top_hinge_hole_2_x_coor_from_door_hinge_edge,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"0.968""",,0.024587 (0.0807 ft),m
+door_height_desired,True,False,False,Double,autodesk.spec.aec:length-2.0.0,,,2.438400 (8.0000 ft),m
+door_notching_left_relative_to_room,True,False,True,Integer,autodesk.spec:spec.bool-1.0.0,"if(not(door_floor_clearance = 1""), 1 = 0, if(and(door_hinge_side_relative_to_room_left, door_wall_post_hinging), 1 = 0, if(and(not(door_hinge_side_relative_to_room_left), door_wall_keep_latching), 1 = 0, 1 = 1)))",,False,Boolean
+hole_back,True,False,False,Double,autodesk.spec.aec:length-2.0.0,"if(door_swing_direction_in, 0"", 0.1875"")",,0.000000 (0.0000 ft),m
+door_width,True,False,True,Double,autodesk.spec.aec:length-2.0.0,"if(door_width_desired < 22"", 22"", if(door_width_desired > 37.5"", 37.5"", door_width_desired))",,0.558800 (1.8333 ft),m
+panel_component_id,True,False,True,String,autodesk.spec:spec.string-2.0.0,,,,Text
+door_work_order_number,True,False,True,String,autodesk.spec:spec.string-2.0.0,,,,Text

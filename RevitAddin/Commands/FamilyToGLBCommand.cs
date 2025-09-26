@@ -75,6 +75,7 @@ namespace RevitFamilyToGLB.Commands
                 // 5. Export each type
                 var exportedTypes = new List<ExportedFamilyType>();
                 var geometryExtractor = new GeometryExtractor(doc, options.DetailLevel);
+                var relationshipExtractor = new ParameterRelationshipExtractor(doc, familyManager);
                 
                 foreach (var familyType in typesToExport)
                 {
@@ -107,22 +108,22 @@ namespace RevitFamilyToGLB.Commands
                         // Rollback transaction (no changes to family)
                         trans.RollBack();
                     }
-                }
 
                 // 6. Create GLB file
                 var glbExporter = new GLBExporter();
                 var outputPath = Path.Combine(options.OutputFolder, 
                     $"{Path.GetFileNameWithoutExtension(doc.Title)}.glb");
-                
+
                 var exportResult = glbExporter.Export(
                     exportedTypes,
                     parameterSchema,
+                    relationshipExtractor.ExtractRelationships(parameterSchema),
                     outputPath);
 
                 // 7. Export parameters to CSV
                 var csvExporter = new ParameterCSVExporter();
                 csvExporter.ExportParametersToCSV(parameterSchema, exportedTypes, outputPath);
-                csvExporter.ExportParameterSummary(parameterSchema, exportedTypes, outputPath);
+{{ ... }}
 
                 // 8. Show summary
                 ShowExportSummary(exportResult, outputPath, parameterSchema.Count);

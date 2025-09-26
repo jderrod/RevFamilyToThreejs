@@ -18,6 +18,7 @@ namespace RevitFamilyToGLB.Export
         public ExportResult Export(
             List<ExportedFamilyType> familyTypes,
             List<ParameterInfo> parameterSchema,
+            List<ParameterRelationship> parameterRelationships,
             string outputPath)
         {
             try
@@ -54,7 +55,7 @@ namespace RevitFamilyToGLB.Export
                 var model = scene.ToGltf2();
 
                 // Add metadata to asset.extras
-                AddMetadata(model, familyTypes, parameterSchema);
+                AddMetadata(model, familyTypes, parameterSchema, parameterRelationships);
 
                 // Save as GLB
                 model.SaveGLB(outputPath);
@@ -126,7 +127,11 @@ namespace RevitFamilyToGLB.Export
         }
 
 
-        private void AddMetadata(ModelRoot model, List<ExportedFamilyType> familyTypes, List<ParameterInfo> parameterSchema)
+        private void AddMetadata(
+            ModelRoot model,
+            List<ExportedFamilyType> familyTypes,
+            List<ParameterInfo> parameterSchema,
+            List<ParameterRelationship> parameterRelationships)
         {
             var metadata = new Dictionary<string, object>
             {
@@ -138,6 +143,7 @@ namespace RevitFamilyToGLB.Export
                         ["name"] = t.Name,
                         ["values"] = t.ParameterValues
                     }).ToList(),
+                    ["relationships"] = parameterRelationships ?? new List<ParameterRelationship>(),
                     ["units"] = new Dictionary<string, string>
                     {
                         ["length"] = "meters",
